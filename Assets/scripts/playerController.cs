@@ -3,7 +3,10 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     private CharacterController _characterController;
-    public float MovementSpeed = 10f, RotationSpeed = 5f, JumpForce = 10f, Gravity = -30f;
+    public float MaxSpeed = 10f;
+    public float MouseSensitivity = 0.12f;
+    public float JumpForce = 10f;
+    public float Gravity = -30f;
 
     private float _rotationY;
     private float _verticalVelocity;
@@ -15,18 +18,20 @@ public class PlayerController : MonoBehaviour
 
     public void Move(Vector2 movementVector)
     {
-        Vector3 move = transform.forward * movementVector.y + transform.right * movementVector.x;
-        move = move * MovementSpeed * Time.deltaTime;
-        _characterController.Move(move);
+        if (_characterController.isGrounded && _verticalVelocity < 0f)
+            _verticalVelocity = -2f;
 
-        _verticalVelocity = _verticalVelocity + Gravity * Time.deltaTime;
-        _characterController.Move(new Vector3(0, _verticalVelocity, 0) * Time.deltaTime);
+        _verticalVelocity += Gravity * Time.deltaTime;
+
+        Vector3 move = transform.forward * movementVector.y + transform.right * movementVector.x;
+        move = move * MaxSpeed + Vector3.up * _verticalVelocity;
+        _characterController.Move(move * Time.deltaTime);
     }
 
     public void Rotate(Vector2 rotationVector)
     {
-        _rotationY += rotationVector.x * RotationSpeed * Time.deltaTime;
-        transform.localRotation = Quaternion.Euler(0, _rotationY, 0);
+        _rotationY += rotationVector.x * MouseSensitivity;
+        transform.localRotation = Quaternion.Euler(0f, _rotationY, 0f);
     }
 
     public void Jump()
