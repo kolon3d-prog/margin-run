@@ -23,28 +23,16 @@ public class InputHandler : MonoBehaviour
         _moveAction.Enable();
         _lookAction.Enable();
         _jumpAction.Enable();
-        _jumpAction.performed += OnJumpPerformed;
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    void OnDestroy()
-    {
-        if (_jumpAction != null)
-            _jumpAction.performed -= OnJumpPerformed;
-    }
-
     void Update()
     {
-        CharacterController.Move(_moveAction.ReadValue<Vector2>());
         Vector2 look = _lookAction.ReadValue<Vector2>();
         CharacterController.Rotate(look);
         Camera.Look(look.y);
-    }
-
-    private void OnJumpPerformed(InputAction.CallbackContext context)
-    {
-        CharacterController.Jump();
+        CharacterController.Move(_moveAction.ReadValue<Vector2>(), _jumpAction.IsPressed());
     }
 }
