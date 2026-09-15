@@ -2,14 +2,16 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    public Transform FollowTarget, LookTarget;
-    public float FollowSpeed = 10f;
+    public float MouseSensitivity = 0.12f;
+    public float MinPitch = -89f;
+    public float MaxPitch = 89f;
 
-    private void LateUpdate()
+    private float _pitch;
+
+    public void Look(float mouseY)
     {
-        Vector3 targetPosition = FollowTarget.position;
-        transform.position = Vector3.Lerp(transform.position, targetPosition, FollowSpeed * Time.deltaTime);
-
-        transform.LookAt(LookTarget);
+        _pitch -= mouseY * MouseSensitivity;
+        _pitch = Mathf.Clamp(_pitch, MinPitch, MaxPitch);
+        transform.localRotation = Quaternion.Euler(_pitch, 0f, 0f);
     }
 }

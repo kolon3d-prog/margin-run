@@ -4,33 +4,35 @@ using UnityEngine.InputSystem;
 public class InputHandler : MonoBehaviour
 {
     public PlayerController CharacterController;
+    public CameraController Camera;
 
     private InputAction _moveAction, _lookAction, _jumpAction;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        _moveAction = InputSystem.actions.FindAction("Move");
-        _lookAction = InputSystem.actions.FindAction("Look");
-        _jumpAction = InputSystem.actions.FindAction("Jump");
+        if (CharacterController == null)
+            CharacterController = GetComponent<PlayerController>();
+        if (Camera == null)
+            Camera = GetComponentInChildren<CameraController>();
 
-        _jumpAction.performed += OnJumpPerformed;
+        var actions = InputSystem.actions;
+        _moveAction = actions.FindAction("Move");
+        _lookAction = actions.FindAction("Look");
+        _jumpAction = actions.FindAction("Jump");
 
+        _moveAction.Enable();
+        _lookAction.Enable();
+        _jumpAction.Enable();
+
+        Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        Vector2 movementVector = _moveAction.ReadValue<Vector2>();
-        CharacterController.Move(movementVector);
-
-        Vector2 lookVector = _lookAction.ReadValue<Vector2>();
-        CharacterController.Rotate(lookVector);
-    }
-
-    private void OnJumpPerformed(InputAction.CallbackContext context)
-    {
-        CharacterController.Jump();
+        Vector2 look = _lookAction.ReadValue<Vector2>();
+        CharacterController.Rotate(look);
+        Camera.Look(look.y);
+        CharacterController.Move(_moveAction.ReadValue<Vector2>(), _jumpAction.IsPressed());
     }
 }
