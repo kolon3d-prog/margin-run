@@ -568,11 +568,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   playerCamera: {fileID: 2093925315}
   walkSpeed: 6
-  runSpeed: 12
-  jumpPower: 7
-  gravity: 10
+  jumpPower: 5
+  gravity: 15
   lookSpeed: 2
-  lookXLimit: 45
+  lookXLimit: 90
   defaultHeight: 2
   crouchHeight: 1
   crouchSpeed: 3
