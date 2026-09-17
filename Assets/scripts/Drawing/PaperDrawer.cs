@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,12 +10,20 @@ public class PaperDrawer : MonoBehaviour
     [SerializeField] private float lineWidth = 0.18f;
     [SerializeField] private float minPointDistance = 0.05f;
 
+    private readonly List<GameObject> undoHistory = new List<GameObject>();
+    private readonly List<GameObject> redoHistory = new List<GameObject>();
+
     private LineRenderer currentLine;
     private Vector3 lastPoint;
     private bool drawingEnabled;
 
+    public bool CanUndo => undoHistory.Count > 0;
+    public bool CanRedo => redoHistory.Count > 0;
+
     private void Update()
     {
+        CheckHistoryShortcuts();
+
         if (!drawingEnabled)
             return;
 
@@ -35,10 +44,79 @@ public class PaperDrawer : MonoBehaviour
             currentLine = null;
     }
 
+    private void CheckHistoryShortcuts()
+    {
+        Keyboard keyboard = Keyboard.current;
+
+        if (keyboard == null)
+            return;
+
+        bool ctrlPressed =
+            keyboard.leftCtrlKey.isPressed ||
+            keyboard.rightCtrlKey.isPressed;
+
+        if (!ctrlPressed)
+            return;
+
+        bool shiftPressed =
+            keyboard.leftShiftKey.isPressed ||
+            keyboard.rightShiftKey.isPressed;
+
+        if (keyboard.zKey.wasPressedThisFrame)
+        {
+            if (shiftPressed)
+                RedoLastLine();
+            else
+                UndoLastLine();
+        }
+        else if (keyboard.yKey.wasPressedThisFrame)
+        {
+            RedoLastLine();
+        }
+    }
+
+    public void UndoLastLine()
+    {
+        if (!CanUndo)
+            return;
+
+        int lastIndex = undoHistory.Count - 1;
+        GameObject lastLine = undoHistory[lastIndex];
+
+        undoHistory.RemoveAt(lastIndex);
+        redoHistory.Add(lastLine);
+
+        if (currentLine != null &&
+            currentLine.gameObject == lastLine)
+        {
+            currentLine = null;
+        }
+
+        lastLine.SetActive(false);
+    }
+
+    public void RedoLastLine()
+    {
+        if (!CanRedo)
+            return;
+
+        int lastIndex = redoHistory.Count - 1;
+        GameObject restoredLine = redoHistory[lastIndex];
+
+        redoHistory.RemoveAt(lastIndex);
+        undoHistory.Add(restoredLine);
+
+        restoredLine.SetActive(true);
+    }
+
     private void StartLine(Vector3 position)
     {
+        ClearRedoHistory();
+
         GameObject lineObject = new GameObject("PencilLine");
         lineObject.transform.SetParent(transform);
+
+        undoHistory.Add(lineObject);
 
         currentLine = lineObject.AddComponent<LineRenderer>();
 
@@ -75,10 +153,24 @@ public class PaperDrawer : MonoBehaviour
         lastPoint = position;
     }
 
+    private void ClearRedoHistory()
+    {
+        foreach (GameObject line in redoHistory)
+        {
+            if (line != null)
+                Destroy(line);
+        }
+
+        redoHistory.Clear();
+    }
+
     private Vector3 GetPencilTipWorldPosition()
     {
         Vector2 tipScreenPosition =
-            RectTransformUtility.WorldToScreenPoint(null, pencilTip.position);
+            RectTransformUtility.WorldToScreenPoint(
+                null,
+                pencilTip.position
+            );
 
         Vector3 screenPosition = new Vector3(
             tipScreenPosition.x,

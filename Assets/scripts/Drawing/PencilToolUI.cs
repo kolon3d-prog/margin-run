@@ -1,6 +1,6 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class PencilToolUI : MonoBehaviour
 {
@@ -21,17 +21,12 @@ public class PencilToolUI : MonoBehaviour
     {
         if (!pencilEquipped||Mouse.current == null)
         return;
-        RectTransform canvasRect = canvas.transform as RectTransform;
+        
         Vector2 mousePosition = Mouse.current.position.ReadValue();
 
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvasRect,
-            mousePosition,
-            null,
-            out Vector2 localPosition
-        );
+        pencilCursor.position = 
+            mousePosition + cursorOffset;
 
-        pencilCursor.anchoredPosition = localPosition + cursorOffset;
     }
 
     private void TogglePencil()
@@ -46,11 +41,16 @@ public class PencilToolUI : MonoBehaviour
         pencilCursor.gameObject.SetActive(equipped);
         Cursor.visible = !equipped;
 
+        Cursor.lockState = equipped
+            ? CursorLockMode.Confined
+            : CursorLockMode.None;
+
         if (paperdrawer != null)
             paperdrawer.SetDrawingEnabled(equipped);
     }
     private void OnDisable()
     {
         Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
 }
