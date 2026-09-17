@@ -64,7 +64,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            float airWish = Mathf.Min(wishspeed, 2f);
+            float airWish = walkSpeed*0.3f;
             Accelerate(wishdir, airWish, airAccel);
         }
 
