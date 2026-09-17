@@ -5,6 +5,7 @@ public class PaperDrawer : MonoBehaviour
 {
     [SerializeField] private Camera drawingCamera;
     [SerializeField] private Material lineMaterial;
+    [SerializeField] private RectTransform pencilTip;
     [SerializeField] private float lineWidth = 0.18f;
     [SerializeField] private float minPointDistance = 0.05f;
 
@@ -14,20 +15,21 @@ public class PaperDrawer : MonoBehaviour
 
     private void Update()
     {
-        if(!drawingEnabled)
+        if (!drawingEnabled)
             return;
+
         Mouse mouse = Mouse.current;
 
-        if (mouse == null)
+        if (mouse == null || pencilTip == null)
             return;
 
-        Vector3 mousePosition = GetMouseWorldPosition();
+        Vector3 drawingPosition = GetPencilTipWorldPosition();
 
         if (mouse.leftButton.wasPressedThisFrame)
-            StartLine(mousePosition);
+            StartLine(drawingPosition);
 
         if (mouse.leftButton.isPressed && currentLine != null)
-            AddPoint(mousePosition);
+            AddPoint(drawingPosition);
 
         if (mouse.leftButton.wasReleasedThisFrame)
             currentLine = null;
@@ -64,6 +66,7 @@ public class PaperDrawer : MonoBehaviour
             return;
 
         currentLine.positionCount++;
+
         currentLine.SetPosition(
             currentLine.positionCount - 1,
             position
@@ -72,13 +75,14 @@ public class PaperDrawer : MonoBehaviour
         lastPoint = position;
     }
 
-    private Vector3 GetMouseWorldPosition()
+    private Vector3 GetPencilTipWorldPosition()
     {
-        Vector2 mouseScreenPosition = Mouse.current.position.ReadValue();
+        Vector2 tipScreenPosition =
+            RectTransformUtility.WorldToScreenPoint(null, pencilTip.position);
 
         Vector3 screenPosition = new Vector3(
-            mouseScreenPosition.x,
-            mouseScreenPosition.y,
+            tipScreenPosition.x,
+            tipScreenPosition.y,
             Mathf.Abs(drawingCamera.transform.position.z)
         );
 
