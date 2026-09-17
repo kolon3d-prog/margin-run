@@ -10,9 +10,12 @@ public class PaperDrawer : MonoBehaviour
 
     private LineRenderer currentLine;
     private Vector3 lastPoint;
+    private bool drawingEnabled;
 
     private void Update()
     {
+        if(!drawingEnabled)
+            return;
         Mouse mouse = Mouse.current;
 
         if (mouse == null)
@@ -85,5 +88,13 @@ public class PaperDrawer : MonoBehaviour
         worldPosition.z = -0.1f;
 
         return worldPosition;
+    }
+
+    public void SetDrawingEnabled(bool enabled)
+    {
+        drawingEnabled = enabled;
+
+        if (!enabled)
+            currentLine = null;
     }
 }
