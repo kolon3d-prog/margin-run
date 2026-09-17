@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 public class PaperDrawer : MonoBehaviour
 {
     [SerializeField] private Camera drawingCamera;
     [SerializeField] private Material lineMaterial;
     [SerializeField] private RectTransform pencilTip;
+    [SerializeField] private SpriteRenderer paperRenderer;
     [SerializeField] private float lineWidth = 0.18f;
     [SerializeField] private float minPointDistance = 0.05f;
 
@@ -29,21 +31,54 @@ public class PaperDrawer : MonoBehaviour
 
         Mouse mouse = Mouse.current;
 
-        if (mouse == null || pencilTip == null)
+        if (mouse == null || pencilTip == null||paperRenderer == null)
             return;
 
         Vector3 drawingPosition = GetPencilTipWorldPosition();
+        bool pointerOverUI = IsPointerOverUI();
+        bool pointerInsidePaper = IsInsidePaper(drawingPosition);
+        bool canDrawHere = pointerInsidePaper && !pointerOverUI;
 
         if (mouse.leftButton.wasPressedThisFrame)
-            StartLine(drawingPosition);
+        {    
+            if (canDrawHere)
+                StartLine(drawingPosition);
+        }
 
         if (mouse.leftButton.isPressed && currentLine != null)
-            AddPoint(drawingPosition);
+        {
+            if (canDrawHere)
+                AddPoint(drawingPosition);
+            else
+                currentLine = null;
+        }
 
         if (mouse.leftButton.wasReleasedThisFrame)
             currentLine = null;
     }
 
+    private bool IsPointerOverUI()
+    {
+        if (EventSystem.current == null)
+            return false;
+        
+        return EventSystem.current.IsPointerOverGameObject();
+    }
+
+    private bool IsInsidePaper(Vector3 position)
+    {
+        Bounds paperBounds = paperRenderer.bounds;
+
+        bool insideHorizontal = 
+            position.x >= paperBounds.min.x &&
+            position.x <= paperBounds.max.x;
+        
+        bool insideVertical = 
+            position.y >= paperBounds.min.y &&
+            position.y <= paperBounds.max.y;
+        
+        return insideHorizontal && insideVertical;
+    }
     private void CheckHistoryShortcuts()
     {
         Keyboard keyboard = Keyboard.current;
@@ -75,6 +110,23 @@ public class PaperDrawer : MonoBehaviour
         }
     }
 
+    public void ClearAllLines()
+    {
+        foreach (GameObject Line in undoHistory)
+        {
+            if (Line != null)
+                Destroy(Line);
+        }
+        
+        foreach (GameObject Line in redoHistory)
+        {
+            if (Line != null)
+                Destroy(Line);
+        }
+        undoHistory.Clear();
+        redoHistory.Clear();
+        currentLine = null;
+    }
     public void UndoLastLine()
     {
         if (!CanUndo)
