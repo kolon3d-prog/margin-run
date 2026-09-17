@@ -241,7 +241,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1801053113794949275, guid: 0c96f8610b9ac09479c851fb9da140e4, type: 3}
       propertyPath: speed
-      value: 10
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1801053113794949275, guid: 0c96f8610b9ac09479c851fb9da140e4, type: 3}
       propertyPath: cameraTransform
@@ -306,7 +306,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1801053113794949275, guid: 0c96f8610b9ac09479c851fb9da140e4, type: 3}
       propertyPath: speed
-      value: 10
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1801053113794949275, guid: 0c96f8610b9ac09479c851fb9da140e4, type: 3}
       propertyPath: cameraTransform
@@ -855,7 +855,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1801053113794949275, guid: 0c96f8610b9ac09479c851fb9da140e4, type: 3}
       propertyPath: speed
-      value: 10
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1801053113794949275, guid: 0c96f8610b9ac09479c851fb9da140e4, type: 3}
       propertyPath: cameraTransform
@@ -1032,7 +1032,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1801053113794949275, guid: 0c96f8610b9ac09479c851fb9da140e4, type: 3}
       propertyPath: speed
-      value: 10
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1801053113794949275, guid: 0c96f8610b9ac09479c851fb9da140e4, type: 3}
       propertyPath: cameraTransform
@@ -1097,7 +1097,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1801053113794949275, guid: 0c96f8610b9ac09479c851fb9da140e4, type: 3}
       propertyPath: speed
-      value: 10
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1801053113794949275, guid: 0c96f8610b9ac09479c851fb9da140e4, type: 3}
       propertyPath: cameraTransform
@@ -1274,7 +1274,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1801053113794949275, guid: 0c96f8610b9ac09479c851fb9da140e4, type: 3}
       propertyPath: speed
-      value: 10
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1801053113794949275, guid: 0c96f8610b9ac09479c851fb9da140e4, type: 3}
       propertyPath: cameraTransform
@@ -1702,7 +1702,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1801053113794949275, guid: 0c96f8610b9ac09479c851fb9da140e4, type: 3}
       propertyPath: speed
-      value: 10
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1801053113794949275, guid: 0c96f8610b9ac09479c851fb9da140e4, type: 3}
       propertyPath: cameraTransform
