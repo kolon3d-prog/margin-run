@@ -238,6 +238,30 @@ public class PaperDrawer : MonoBehaviour
         return worldPosition;
     }
 
+    public void RemoveLineFromHistory(GameObject lineObject)
+    {
+        if (lineObject == null)
+            return;
+
+        undoHistory.Remove(lineObject);
+        redoHistory.Remove(lineObject);
+
+        if (currentLine != null &&
+            currentLine.gameObject == lineObject)
+        {
+            currentLine = null;
+        }
+    }
+
+    public void RegisterGeneratedLine(GameObject lineObject)
+    {
+        if (lineObject == null)
+            return;
+
+        ClearRedoHistory();
+        undoHistory.Add(lineObject);        
+    }
+
     public void SetDrawingEnabled(bool enabled)
     {
         drawingEnabled = enabled;

@@ -21,6 +21,7 @@ public class ToolManager : MonoBehaviour
 
     [Header("Drawing")]
     [SerializeField] private PaperDrawer paperDrawer;
+    [SerializeField] private StrokeEraser strokeEraser;
 
     [Header("Cursor offsets")]
     [SerializeField] private Vector2 pencilOffset =
@@ -91,6 +92,10 @@ public class ToolManager : MonoBehaviour
 
         paperDrawer.SetDrawingEnabled(
             activeTool == DrawingTool.Pencil
+        );
+
+        strokeEraser.SetErasingEnabled(
+            activeTool == DrawingTool.Eraser
         );
 
         bool toolSelected = activeTool != DrawingTool.None;
