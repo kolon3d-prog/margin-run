@@ -34,7 +34,7 @@ public class DrawingHistoryUI : MonoBehaviour
         paperDrawer.RedoLastLine();
         RefreshButtons();
     }
-    
+
     private void Clear()
     {
         paperDrawer.ClearAllLines();
@@ -43,21 +43,23 @@ public class DrawingHistoryUI : MonoBehaviour
 
     private void RefreshButtons()
     {
-        if(paperDrawer == null)
+        if (paperDrawer == null)
             return;
-        
+
         undoButton.interactable = paperDrawer.CanUndo;
         redoButton.interactable = paperDrawer.CanRedo;
 
-        clearButton.interactable = paperDrawer.CanUndo || paperDrawer.CanRedo;
+        clearButton.interactable = paperDrawer.CanClear;
     }
 
     private void OnDestroy()
     {
         if (undoButton != null)
             undoButton.onClick.RemoveListener(Undo);
+
         if (redoButton != null)
             redoButton.onClick.RemoveListener(Redo);
+
         if (clearButton != null)
             clearButton.onClick.RemoveListener(Clear);
     }

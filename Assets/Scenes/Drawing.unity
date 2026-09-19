@@ -204,6 +204,7 @@ GameObject:
   m_Component:
   - component: {fileID: 67459227}
   - component: {fileID: 67459228}
+  - component: {fileID: 67459229}
   m_Layer: 0
   m_Name: DrawingCanvas
   m_TagString: Untagged
@@ -244,6 +245,25 @@ MonoBehaviour:
   paperRenderer: {fileID: 540334537}
   lineWidth: 0.18
   minPointDistance: 0.05
+--- !u!114 &67459229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 67459226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f471354162b4a4242aeb20860b157617, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StrokeEraser
+  drawingCamera: {fileID: 1873853409}
+  eraserTip: {fileID: 1071576923}
+  linesParent: {fileID: 67459227}
+  paperRenderer: {fileID: 540334537}
+  paperDrawer: {fileID: 67459228}
+  eraserRadius: 0.35
+  sampleSpacing: 0.04
 --- !u!1 &67581387
 GameObject:
   m_ObjectHideFlags: 0
@@ -1907,8 +1927,9 @@ MonoBehaviour:
   pencilCursor: {fileID: 537423579}
   eraserCursor: {fileID: 940254969}
   paperDrawer: {fileID: 67459228}
-  pencilOffset: {x: 90, y: -90}
-  eraserOffset: {x: 40, y: -40}
+  strokeEraser: {fileID: 67459229}
+  pencilOffset: {x: 35, y: -55}
+  eraserOffset: {x: 33, y: -50}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

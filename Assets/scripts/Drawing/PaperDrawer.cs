@@ -12,8 +12,19 @@ public class PaperDrawer : MonoBehaviour
     [SerializeField] private float lineWidth = 0.18f;
     [SerializeField] private float minPointDistance = 0.05f;
 
-    private readonly List<GameObject> undoHistory = new List<GameObject>();
-    private readonly List<GameObject> redoHistory = new List<GameObject>();
+    [Tooltip("Максимум шагов в истории. 0 — без ограничения.")]
+    [SerializeField] private int maxHistorySteps = 100;
+
+    private readonly List<DrawingAction> undoHistory =
+        new List<DrawingAction>();
+
+    private readonly List<DrawingAction> redoHistory =
+        new List<DrawingAction>();
+
+    private readonly HashSet<GameObject> activeLines =
+        new HashSet<GameObject>();
+
+    private DrawingAction pendingAction;
 
     private LineRenderer currentLine;
     private Vector3 lastPoint;
@@ -21,6 +32,9 @@ public class PaperDrawer : MonoBehaviour
 
     public bool CanUndo => undoHistory.Count > 0;
     public bool CanRedo => redoHistory.Count > 0;
+    public bool CanClear => activeLines.Count > 0;
+
+    public IReadOnlyCollection<GameObject> ActiveLines => activeLines;
 
     private void Update()
     {
@@ -31,7 +45,7 @@ public class PaperDrawer : MonoBehaviour
 
         Mouse mouse = Mouse.current;
 
-        if (mouse == null || pencilTip == null||paperRenderer == null)
+        if (mouse == null || pencilTip == null || paperRenderer == null)
             return;
 
         Vector3 drawingPosition = GetPencilTipWorldPosition();
@@ -40,7 +54,7 @@ public class PaperDrawer : MonoBehaviour
         bool canDrawHere = pointerInsidePaper && !pointerOverUI;
 
         if (mouse.leftButton.wasPressedThisFrame)
-        {    
+        {
             if (canDrawHere)
                 StartLine(drawingPosition);
         }
@@ -54,31 +68,263 @@ public class PaperDrawer : MonoBehaviour
         }
 
         if (mouse.leftButton.wasReleasedThisFrame)
+        {
             currentLine = null;
+            CommitAction();
+        }
     }
 
-    private bool IsPointerOverUI()
+    public void BeginAction()
     {
-        if (EventSystem.current == null)
-            return false;
-        
-        return EventSystem.current.IsPointerOverGameObject();
+        if (pendingAction != null)
+            CommitAction();
+
+        pendingAction = new DrawingAction();
     }
 
-    private bool IsInsidePaper(Vector3 position)
+    public void CommitAction()
     {
-        Bounds paperBounds = paperRenderer.bounds;
+        if (pendingAction == null)
+            return;
 
-        bool insideHorizontal = 
-            position.x >= paperBounds.min.x &&
-            position.x <= paperBounds.max.x;
-        
-        bool insideVertical = 
-            position.y >= paperBounds.min.y &&
-            position.y <= paperBounds.max.y;
-        
-        return insideHorizontal && insideVertical;
+        DrawingAction action = pendingAction;
+        pendingAction = null;
+
+        CoalesceAction(action);
+
+        if (!action.HasChanges)
+            return;
+
+        ClearRedoHistory();
+        undoHistory.Add(action);
+
+        TrimHistory();
     }
+
+    public void NotifyLineCreated(GameObject lineObject)
+    {
+        if (lineObject == null)
+            return;
+
+        if (pendingAction == null)
+            BeginAction();
+
+        activeLines.Add(lineObject);
+        pendingAction.Added.Add(lineObject);
+    }
+
+    public void NotifyLineRemoved(GameObject lineObject)
+    {
+        if (lineObject == null)
+            return;
+
+        if (pendingAction == null)
+            BeginAction();
+
+        if (currentLine != null &&
+            currentLine.gameObject == lineObject)
+        {
+            currentLine = null;
+        }
+
+        activeLines.Remove(lineObject);
+        pendingAction.Removed.Add(lineObject);
+
+        lineObject.SetActive(false);
+    }
+
+    private void CoalesceAction(DrawingAction action)
+    {
+        for (int i = action.Added.Count - 1; i >= 0; i--)
+        {
+            GameObject lineObject = action.Added[i];
+
+            if (lineObject == null)
+            {
+                action.Added.RemoveAt(i);
+                continue;
+            }
+
+            if (action.Removed.Remove(lineObject))
+            {
+                action.Added.RemoveAt(i);
+                Destroy(lineObject);
+            }
+        }
+
+        for (int i = action.Removed.Count - 1; i >= 0; i--)
+        {
+            if (action.Removed[i] == null)
+                action.Removed.RemoveAt(i);
+        }
+    }
+
+    public void UndoLastLine()
+    {
+        CommitAction();
+
+        if (!CanUndo)
+            return;
+
+        int lastIndex = undoHistory.Count - 1;
+        DrawingAction action = undoHistory[lastIndex];
+        undoHistory.RemoveAt(lastIndex);
+
+        foreach (GameObject lineObject in action.Added)
+            SetLineVisible(lineObject, false);
+
+        foreach (GameObject lineObject in action.Removed)
+            SetLineVisible(lineObject, true);
+
+        redoHistory.Add(action);
+    }
+
+    public void RedoLastLine()
+    {
+        CommitAction();
+
+        if (!CanRedo)
+            return;
+
+        int lastIndex = redoHistory.Count - 1;
+        DrawingAction action = redoHistory[lastIndex];
+        redoHistory.RemoveAt(lastIndex);
+
+        foreach (GameObject lineObject in action.Removed)
+            SetLineVisible(lineObject, false);
+
+        foreach (GameObject lineObject in action.Added)
+            SetLineVisible(lineObject, true);
+
+        undoHistory.Add(action);
+    }
+
+    private void SetLineVisible(GameObject lineObject, bool visible)
+    {
+        if (lineObject == null)
+            return;
+
+        if (!visible &&
+            currentLine != null &&
+            currentLine.gameObject == lineObject)
+        {
+            currentLine = null;
+        }
+
+        lineObject.SetActive(visible);
+
+        if (visible)
+            activeLines.Add(lineObject);
+        else
+            activeLines.Remove(lineObject);
+    }
+
+    public void ClearAllLines()
+    {
+        currentLine = null;
+        CommitAction();
+
+        if (!CanClear)
+            return;
+
+        BeginAction();
+
+        List<GameObject> linesToRemove =
+            new List<GameObject>(activeLines);
+
+        foreach (GameObject lineObject in linesToRemove)
+            NotifyLineRemoved(lineObject);
+
+        CommitAction();
+    }
+
+    private void ClearRedoHistory()
+    {
+        foreach (DrawingAction action in redoHistory)
+        {
+            foreach (GameObject lineObject in action.Added)
+            {
+                if (lineObject != null)
+                    Destroy(lineObject);
+            }
+        }
+
+        redoHistory.Clear();
+    }
+
+    private void TrimHistory()
+    {
+        if (maxHistorySteps <= 0)
+            return;
+
+        while (undoHistory.Count > maxHistorySteps)
+        {
+            DrawingAction oldest = undoHistory[0];
+            undoHistory.RemoveAt(0);
+
+            foreach (GameObject lineObject in oldest.Removed)
+            {
+                if (lineObject != null)
+                    Destroy(lineObject);
+            }
+        }
+    }
+
+    private void StartLine(Vector3 position)
+    {
+        BeginAction();
+
+        GameObject lineObject = new GameObject("PencilLine");
+        lineObject.transform.SetParent(transform);
+
+        currentLine = lineObject.AddComponent<LineRenderer>();
+
+        currentLine.material = lineMaterial;
+        currentLine.useWorldSpace = true;
+        currentLine.textureMode = LineTextureMode.Tile;
+
+        currentLine.startWidth = lineWidth;
+        currentLine.endWidth = lineWidth;
+
+        currentLine.numCapVertices = 6;
+        currentLine.numCornerVertices = 6;
+        currentLine.sortingOrder = 0;
+
+        currentLine.positionCount = 2;
+        currentLine.SetPosition(0, position);
+        currentLine.SetPosition(1, position);
+
+        lastPoint = position;
+
+        NotifyLineCreated(lineObject);
+    }
+
+    private void AddPoint(Vector3 position)
+    {
+        if (Vector3.Distance(lastPoint, position) < minPointDistance)
+            return;
+
+        currentLine.positionCount++;
+
+        currentLine.SetPosition(
+            currentLine.positionCount - 1,
+            position
+        );
+
+        lastPoint = position;
+    }
+
+    public void SetDrawingEnabled(bool enabled)
+    {
+        drawingEnabled = enabled;
+
+        if (!enabled)
+        {
+            currentLine = null;
+            CommitAction();
+        }
+    }
+
     private void CheckHistoryShortcuts()
     {
         Keyboard keyboard = Keyboard.current;
@@ -110,110 +356,27 @@ public class PaperDrawer : MonoBehaviour
         }
     }
 
-    public void ClearAllLines()
+    private bool IsPointerOverUI()
     {
-        foreach (GameObject Line in undoHistory)
-        {
-            if (Line != null)
-                Destroy(Line);
-        }
-        
-        foreach (GameObject Line in redoHistory)
-        {
-            if (Line != null)
-                Destroy(Line);
-        }
-        undoHistory.Clear();
-        redoHistory.Clear();
-        currentLine = null;
-    }
-    public void UndoLastLine()
-    {
-        if (!CanUndo)
-            return;
+        if (EventSystem.current == null)
+            return false;
 
-        int lastIndex = undoHistory.Count - 1;
-        GameObject lastLine = undoHistory[lastIndex];
-
-        undoHistory.RemoveAt(lastIndex);
-        redoHistory.Add(lastLine);
-
-        if (currentLine != null &&
-            currentLine.gameObject == lastLine)
-        {
-            currentLine = null;
-        }
-
-        lastLine.SetActive(false);
+        return EventSystem.current.IsPointerOverGameObject();
     }
 
-    public void RedoLastLine()
+    private bool IsInsidePaper(Vector3 position)
     {
-        if (!CanRedo)
-            return;
+        Bounds paperBounds = paperRenderer.bounds;
 
-        int lastIndex = redoHistory.Count - 1;
-        GameObject restoredLine = redoHistory[lastIndex];
+        bool insideHorizontal =
+            position.x >= paperBounds.min.x &&
+            position.x <= paperBounds.max.x;
 
-        redoHistory.RemoveAt(lastIndex);
-        undoHistory.Add(restoredLine);
+        bool insideVertical =
+            position.y >= paperBounds.min.y &&
+            position.y <= paperBounds.max.y;
 
-        restoredLine.SetActive(true);
-    }
-
-    private void StartLine(Vector3 position)
-    {
-        ClearRedoHistory();
-
-        GameObject lineObject = new GameObject("PencilLine");
-        lineObject.transform.SetParent(transform);
-
-        undoHistory.Add(lineObject);
-
-        currentLine = lineObject.AddComponent<LineRenderer>();
-
-        currentLine.material = lineMaterial;
-        currentLine.useWorldSpace = true;
-        currentLine.textureMode = LineTextureMode.Tile;
-
-        currentLine.startWidth = lineWidth;
-        currentLine.endWidth = lineWidth;
-
-        currentLine.numCapVertices = 6;
-        currentLine.numCornerVertices = 6;
-        currentLine.sortingOrder = 0;
-
-        currentLine.positionCount = 2;
-        currentLine.SetPosition(0, position);
-        currentLine.SetPosition(1, position);
-
-        lastPoint = position;
-    }
-
-    private void AddPoint(Vector3 position)
-    {
-        if (Vector3.Distance(lastPoint, position) < minPointDistance)
-            return;
-
-        currentLine.positionCount++;
-
-        currentLine.SetPosition(
-            currentLine.positionCount - 1,
-            position
-        );
-
-        lastPoint = position;
-    }
-
-    private void ClearRedoHistory()
-    {
-        foreach (GameObject line in redoHistory)
-        {
-            if (line != null)
-                Destroy(line);
-        }
-
-        redoHistory.Clear();
+        return insideHorizontal && insideVertical;
     }
 
     private Vector3 GetPencilTipWorldPosition()
@@ -236,37 +399,5 @@ public class PaperDrawer : MonoBehaviour
         worldPosition.z = -0.1f;
 
         return worldPosition;
-    }
-
-    public void RemoveLineFromHistory(GameObject lineObject)
-    {
-        if (lineObject == null)
-            return;
-
-        undoHistory.Remove(lineObject);
-        redoHistory.Remove(lineObject);
-
-        if (currentLine != null &&
-            currentLine.gameObject == lineObject)
-        {
-            currentLine = null;
-        }
-    }
-
-    public void RegisterGeneratedLine(GameObject lineObject)
-    {
-        if (lineObject == null)
-            return;
-
-        ClearRedoHistory();
-        undoHistory.Add(lineObject);        
-    }
-
-    public void SetDrawingEnabled(bool enabled)
-    {
-        drawingEnabled = enabled;
-
-        if (!enabled)
-            currentLine = null;
     }
 }

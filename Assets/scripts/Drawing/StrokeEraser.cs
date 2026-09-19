@@ -14,6 +14,9 @@ public class StrokeEraser : MonoBehaviour
     [SerializeField] private float eraserRadius = 0.35f;
     [SerializeField] private float sampleSpacing = 0.04f;
 
+    private readonly List<GameObject> eraseBuffer =
+        new List<GameObject>();
+
     private bool erasingEnabled;
     private bool eraseDragStarted;
 
@@ -39,6 +42,9 @@ public class StrokeEraser : MonoBehaviour
             eraseDragStarted =
                 IsInsidePaper(eraserPosition) &&
                 !IsPointerOverUI();
+
+            if (eraseDragStarted)
+                paperDrawer.BeginAction();
         }
 
         if (mouse.leftButton.isPressed &&
@@ -49,7 +55,7 @@ public class StrokeEraser : MonoBehaviour
         }
 
         if (mouse.leftButton.wasReleasedThisFrame)
-            eraseDragStarted = false;
+            FinishEraseDrag();
     }
 
     public void SetErasingEnabled(bool enabled)
@@ -57,17 +63,35 @@ public class StrokeEraser : MonoBehaviour
         erasingEnabled = enabled;
 
         if (!enabled)
-            eraseDragStarted = false;
+            FinishEraseDrag();
+    }
+
+    private void FinishEraseDrag()
+    {
+        if (!eraseDragStarted)
+            return;
+
+        eraseDragStarted = false;
+
+        if (paperDrawer != null)
+            paperDrawer.CommitAction();
     }
 
     private void EraseAt(Vector3 eraserPosition)
     {
-        LineRenderer[] lines =
-            linesParent.GetComponentsInChildren<LineRenderer>(false);
+        eraseBuffer.Clear();
+        eraseBuffer.AddRange(paperDrawer.ActiveLines);
 
-        foreach (LineRenderer line in lines)
+        foreach (GameObject lineObject in eraseBuffer)
         {
-            TryEraseLine(line, eraserPosition);
+            if (lineObject == null || !lineObject.activeSelf)
+                continue;
+
+            LineRenderer line =
+                lineObject.GetComponent<LineRenderer>();
+
+            if (line != null)
+                TryEraseLine(line, eraserPosition);
         }
     }
 
@@ -100,9 +124,7 @@ public class StrokeEraser : MonoBehaviour
         if (!erasedAnything)
             return;
 
-        paperDrawer.RemoveLineFromHistory(
-            originalLine.gameObject
-        );
+        paperDrawer.NotifyLineRemoved(originalLine.gameObject);
 
         foreach (List<Vector3> segment in remainingSegments)
         {
@@ -112,12 +134,8 @@ public class StrokeEraser : MonoBehaviour
             LineRenderer newLine =
                 CreateLineSegment(originalLine, segment);
 
-            paperDrawer.RegisterGeneratedLine(
-                newLine.gameObject
-            );
+            paperDrawer.NotifyLineCreated(newLine.gameObject);
         }
-
-        Destroy(originalLine.gameObject);
     }
 
     private List<Vector3> CreateSampledPoints(
