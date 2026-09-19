@@ -4,17 +4,17 @@ public class billboard : MonoBehaviour
 {
     public Transform cameraTransform;
     public float speed = 10;
-    private Vector3 movement;
+    
+    Vector3 home;
+    float phase;
 
     void Start()
     {
+        home = transform.position;
+        phase = Random.Range(0f, 20f);
+
         if (Camera.main != null)
             cameraTransform = Camera.main.transform;
-
-        movement = new Vector3(Random.Range(-1.0f, 1.0f), 0, Random.Range(-1.0f, 1.0f));
-        if (movement.sqrMagnitude < 0.01f)
-            movement = Vector3.right;
-        movement.Normalize();
     }
 
     void Update()
@@ -24,6 +24,9 @@ public class billboard : MonoBehaviour
 
         transform.LookAt(cameraTransform);
         transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
-        transform.position += movement * speed * Time.deltaTime;
+
+        float x = Mathf.Sin(Time.time * speed * phase) * 1f;
+        float y = Mathf.Sin(Time.time * speed * 0.4f + phase) * 0.4f;
+        transform.position = home + new Vector3(x, y, 0f);
     }
 }
