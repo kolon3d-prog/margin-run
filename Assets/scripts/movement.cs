@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
@@ -105,6 +106,11 @@ public class PlayerMovement : MonoBehaviour
             playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
         }
+
+        // death below
+
+        if (transform.position.y < -20f)
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     void Accelerate(Vector3 wishdir, float wishspeed, float accel)
     {
@@ -123,4 +129,5 @@ public class PlayerMovement : MonoBehaviour
         moveDirection.x += wishdir.x * accelSpeed;
         moveDirection.z += wishdir.z * accelSpeed;
     }
+
 }
