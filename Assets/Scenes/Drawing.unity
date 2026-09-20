@@ -245,6 +245,7 @@ MonoBehaviour:
   paperRenderer: {fileID: 540334537}
   lineWidth: 0.18
   minPointDistance: 0.05
+  maxHistorySteps: 100
 --- !u!114 &67459229
 MonoBehaviour:
   m_ObjectHideFlags: 0

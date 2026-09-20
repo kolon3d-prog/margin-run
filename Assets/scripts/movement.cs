@@ -109,8 +109,13 @@ public class PlayerMovement : MonoBehaviour
 
         // death below
 
-        if (transform.position.y < -20f)
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        if (transform.position.y < -20f){
+            transform.position = new Vector3(0f, 2f, 0f); 
+            moveDirection = Vector3.zero;
+            var mode = FindObjectOfType<modesketch>();
+            if (mode != null)
+                mode.GoSketch();
+        }
     }
     void Accelerate(Vector3 wishdir, float wishspeed, float accel)
     {
