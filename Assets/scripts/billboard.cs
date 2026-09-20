@@ -23,7 +23,7 @@ public class billboard : MonoBehaviour
             return;
 
         transform.LookAt(cameraTransform);
-        transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
+        transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, -90f);
 
         float x = Mathf.Sin(Time.time * speed * phase) * 1f;
         float y = Mathf.Sin(Time.time * speed * 0.4f + phase) * 0.4f;
