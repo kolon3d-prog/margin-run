@@ -244,6 +244,7 @@ GameObject:
   - component: {fileID: 62906616}
   - component: {fileID: 62906615}
   - component: {fileID: 62906614}
+  - component: {fileID: 62906618}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -337,13 +338,27 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 62906613}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.40821788, y: 0.23456968, z: -0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: -14.483396, y: -21.742071, z: -13.426811}
-  m_LocalScale: {x: 8.09, y: 1.5899998, z: 1.5900003}
+  m_LocalRotation: {x: -0.40821794, y: 0.23456962, z: -0.109381646, w: 0.8754261}
+  m_LocalPosition: {x: -14.483392, y: -21.742065, z: -13.426807}
+  m_LocalScale: {x: 8.09, y: 1.5899999, z: 1.5900004}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1979285084}
+  m_Father: {fileID: 1498388773}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &62906618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62906613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 131fc45535bcbb5458b5a28e3fd381b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DrawingBlockerSetup
+  blockerLayerName: DrawingBlocker
+  addMeshColliders: 1
 --- !u!1001 &198892490
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -690,6 +705,7 @@ GameObject:
   - component: {fileID: 684574900}
   - component: {fileID: 684574899}
   - component: {fileID: 684574898}
+  - component: {fileID: 684574902}
   m_Layer: 0
   m_Name: Cube (5)
   m_TagString: Untagged
@@ -783,13 +799,27 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 684574897}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.40821788, y: 0.23456968, z: -0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: -21.919998, y: -35.859047, z: -16.330324}
-  m_LocalScale: {x: 14.96, y: 14.959998, z: 14.960002}
+  m_LocalRotation: {x: -0.40821794, y: 0.23456962, z: -0.109381646, w: 0.8754261}
+  m_LocalPosition: {x: -21.91999, y: -35.859035, z: -16.330318}
+  m_LocalScale: {x: 14.960002, y: 14.959999, z: 14.960002}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 1979285084}
+  m_Father: {fileID: 1498388773}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &684574902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 684574897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 131fc45535bcbb5458b5a28e3fd381b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DrawingBlockerSetup
+  blockerLayerName: DrawingBlocker
+  addMeshColliders: 1
 --- !u!1 &694081883
 GameObject:
   m_ObjectHideFlags: 0
@@ -902,6 +932,7 @@ GameObject:
   - component: {fileID: 810770757}
   - component: {fileID: 810770756}
   - component: {fileID: 810770755}
+  - component: {fileID: 810770759}
   m_Layer: 0
   m_Name: Cube (3)
   m_TagString: Untagged
@@ -995,13 +1026,27 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 810770754}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.40821788, y: 0.23456968, z: -0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: -19.017067, y: -21.026115, z: -15.201898}
-  m_LocalScale: {x: 1.72, y: 5.0499997, z: 1}
+  m_LocalRotation: {x: -0.40821794, y: 0.23456962, z: -0.109381646, w: 0.8754261}
+  m_LocalPosition: {x: -19.01706, y: -21.026108, z: -15.201895}
+  m_LocalScale: {x: 1.7200001, y: 5.05, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1979285084}
+  m_Father: {fileID: 1498388773}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &810770759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810770754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 131fc45535bcbb5458b5a28e3fd381b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DrawingBlockerSetup
+  blockerLayerName: DrawingBlocker
+  addMeshColliders: 1
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1216,6 +1261,7 @@ GameObject:
   - component: {fileID: 1071198273}
   - component: {fileID: 1071198272}
   - component: {fileID: 1071198271}
+  - component: {fileID: 1071198275}
   m_Layer: 0
   m_Name: Cube (4)
   m_TagString: Untagged
@@ -1309,13 +1355,27 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1071198270}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.40821788, y: 0.23456968, z: -0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: -17.173393, y: -25.311235, z: -16.421696}
-  m_LocalScale: {x: 8.09, y: 1.5899998, z: 1.5900003}
+  m_LocalRotation: {x: -0.40821794, y: 0.23456962, z: -0.109381646, w: 0.8754261}
+  m_LocalPosition: {x: -17.173388, y: -25.311226, z: -16.421692}
+  m_LocalScale: {x: 8.09, y: 1.5899999, z: 1.5900004}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1979285084}
+  m_Father: {fileID: 1498388773}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1071198275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1071198270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 131fc45535bcbb5458b5a28e3fd381b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DrawingBlockerSetup
+  blockerLayerName: DrawingBlocker
+  addMeshColliders: 1
 --- !u!1001 &1134459996
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1544,6 +1604,7 @@ GameObject:
   - component: {fileID: 1237856000}
   - component: {fileID: 1237855999}
   - component: {fileID: 1237855998}
+  - component: {fileID: 1237856002}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -1637,13 +1698,27 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1237855997}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.40821788, y: 0.23456968, z: -0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: -8.899999, y: -18.583748, z: -1.8346252}
-  m_LocalScale: {x: 14.96, y: 14.959998, z: 14.960002}
+  m_LocalRotation: {x: -0.40821794, y: 0.23456962, z: -0.109381646, w: 0.8754261}
+  m_LocalPosition: {x: -8.899996, y: -18.583746, z: -1.8346224}
+  m_LocalScale: {x: 14.960002, y: 14.959999, z: 14.960002}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 1979285084}
+  m_Father: {fileID: 1498388773}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1237856002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1237855997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 131fc45535bcbb5458b5a28e3fd381b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DrawingBlockerSetup
+  blockerLayerName: DrawingBlocker
+  addMeshColliders: 1
 --- !u!1001 &1380635093
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1794,6 +1869,7 @@ GameObject:
   - component: {fileID: 1424906145}
   - component: {fileID: 1424906144}
   - component: {fileID: 1424906143}
+  - component: {fileID: 1424906147}
   m_Layer: 0
   m_Name: Cube (2)
   m_TagString: Untagged
@@ -1887,13 +1963,79 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1424906142}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.40821788, y: 0.23456968, z: -0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: -12.946228, y: -23.711102, z: -17.454868}
-  m_LocalScale: {x: 1.72, y: 5.0499997, z: 1}
+  m_LocalRotation: {x: -0.40821794, y: 0.23456962, z: -0.109381646, w: 0.8754261}
+  m_LocalPosition: {x: -12.946224, y: -23.711094, z: -17.454865}
+  m_LocalScale: {x: 1.7200001, y: 5.05, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
+  m_Father: {fileID: 1498388773}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1424906147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1424906142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 131fc45535bcbb5458b5a28e3fd381b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DrawingBlockerSetup
+  blockerLayerName: DrawingBlocker
+  addMeshColliders: 1
+--- !u!1 &1498388772
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1498388773}
+  - component: {fileID: 1498388774}
+  m_Layer: 0
+  m_Name: ExistingLevelRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1498388773
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1498388772}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1237856001}
+  - {fileID: 684574901}
+  - {fileID: 62906617}
+  - {fileID: 1071198274}
+  - {fileID: 1424906146}
+  - {fileID: 810770758}
   m_Father: {fileID: 1979285084}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1498388774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1498388772}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6700c6bfcddea74a93f5c0b420244d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PencilOutlineInstaller
+  outlineMaterial: {fileID: 2100000, guid: 76fefce85a118684da003d321a7fd684, type: 2}
+  includeInactive: 1
 --- !u!1001 &1895182498
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2008,11 +2150,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::runExtrude
   paperDrawer: {fileID: 0}
-  paperOrigin: {fileID: 1196702856}
-  height: 1.2
-  width: 0.35
+  platformDepth: 2.5
+  platformThickness: 0.35
+  simplifyTolerance: 0.06
+  horizontalSnapAngle: 5
+  minimumSegmentLength: 0.04
   wallMaterial: {fileID: 2100000, guid: 58781c3302accbe4385eae1a17557717, type: 2}
+  pencilOutlineMaterial: {fileID: 2100000, guid: 8a078b0ea86648a418b2e7b1c7ca61e2, type: 2}
   spawnParent: {fileID: 694081884}
+  drawingBlockerLayerName: DrawingBlocker
 --- !u!1001 &1949729552
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2181,12 +2327,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 902973940}
-  - {fileID: 1237856001}
-  - {fileID: 684574901}
-  - {fileID: 62906617}
-  - {fileID: 1071198274}
-  - {fileID: 1424906146}
-  - {fileID: 810770758}
+  - {fileID: 1498388773}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -120, z: 0}
 --- !u!1 &2014975979

@@ -245,6 +245,9 @@ MonoBehaviour:
   paperRenderer: {fileID: 540334537}
   lineWidth: 0.18
   minPointDistance: 0.05
+  drawingBlockerMask:
+    serializedVersion: 2
+    m_Bits: 128
   maxHistorySteps: 100
 --- !u!114 &67459229
 MonoBehaviour:

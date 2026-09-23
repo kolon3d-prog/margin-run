@@ -1,87 +1,114 @@
 using System.Collections.Generic;
-using UnityEngine.InputSystem;
 using UnityEngine;
 
 public class runExtrude : MonoBehaviour
 {
-  [Header("sketch scene")]
-  public PaperDrawer paperDrawer;
+    public PaperDrawer paperDrawer;
+    [Min(0.1f)] public float platformDepth = 2.5f;
+    [Min(0.05f)] public float platformThickness = 0.35f;
+    [Min(0f)] public float simplifyTolerance = 0.06f;
+    [Range(0f, 20f)] public float horizontalSnapAngle = 5f;
+    [Min(0.001f)] public float minimumSegmentLength = 0.04f;
+    public Material wallMaterial;
+    public Material pencilOutlineMaterial;
+    public Transform spawnParent;
+    public string drawingBlockerLayerName = "DrawingBlocker";
 
-  [Header("3d")]
-  public Transform paperOrigin;
-  public float height = 1.2f;
-  public float width = 0.35f;
-  public Material wallMaterial;
-  public Transform spawnParent;
+    private readonly List<GameObject> spawned = new List<GameObject>();
 
-  readonly List<GameObject> spawned = new List<GameObject>();
-
-  public void ExtrudeAllLines()
-  {
-    ClearSpawned();
-
-    if (paperDrawer == null)
-      paperDrawer = FindFirstObjectByType<PaperDrawer>();
-      Debug.Log(paperDrawer.ActiveLines.Count);
-
-    if (paperDrawer == null)
-      return;
-    
-    foreach (GameObject lineGo in paperDrawer.ActiveLines)
+    public void ExtrudeAllLines()
     {
-      if (lineGo == null || !lineGo.activeInHierarchy)
-        continue;
-      
-      LineRenderer lr = lineGo.GetComponent<LineRenderer>();
-      if (lr == null || lr.positionCount < 2)
-        continue;
+        ClearSpawned();
 
-      List<Vector3> worldPts = new List<Vector3>(lr.positionCount);
-      for (int i = 0; i < lr.positionCount; i++)
-      {
-        Vector3 p = lr.GetPosition(i);
-        worldPts.Add(p);
-      }
+        if (paperDrawer == null)
+            paperDrawer = FindFirstObjectByType<PaperDrawer>();
 
-      Mesh mesh = LineExtruder.BuildPrism(worldPts, width, height);
-      GameObject go = new GameObject("Extruded_" + lineGo.name);
-      if (spawnParent != null)
-        go.transform.SetParent(spawnParent, true);
-      
-      MeshFilter mf = go.AddComponent<MeshFilter>();
-      mf.sharedMesh = mesh;
+        if (paperDrawer == null)
+        {
+            Debug.LogError("runExtrude: PaperDrawer was not found.");
+            return;
+        }
 
-      MeshRenderer mr = go.AddComponent<MeshRenderer>();
-      mr.sharedMaterial = wallMaterial;
+        foreach (GameObject lineObject in paperDrawer.ActiveLines)
+        {
+            if (lineObject == null || !lineObject.activeInHierarchy)
+                continue;
 
-      MeshCollider mc = go.AddComponent<MeshCollider>();
-      mc.sharedMesh = mesh;
+            LineRenderer line = lineObject.GetComponent<LineRenderer>();
 
-      spawned.Add(go);
+            if (line == null || line.positionCount < 2)
+                continue;
+
+            List<Vector3> points = GetWorldPoints(line);
+            Mesh mesh = LineExtruder.BuildPlatform(points, platformDepth, platformThickness, simplifyTolerance, horizontalSnapAngle, minimumSegmentLength);
+
+            if (mesh.vertexCount == 0)
+            {
+                Destroy(mesh);
+                continue;
+            }
+
+            GameObject platform = new GameObject("Platform_" + lineObject.name);
+
+            if (spawnParent != null)
+                platform.transform.SetParent(spawnParent, true);
+
+            MeshFilter filter = platform.AddComponent<MeshFilter>();
+            filter.sharedMesh = mesh;
+
+            MeshRenderer renderer = platform.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = wallMaterial;
+
+            MeshCollider collider = platform.AddComponent<MeshCollider>();
+            collider.sharedMesh = mesh;
+
+            int blockerLayer = LayerMask.NameToLayer(drawingBlockerLayerName);
+
+            if (blockerLayer >= 0)
+                platform.layer = blockerLayer;
+
+            if (pencilOutlineMaterial != null)
+            {
+                PencilOutline outline = platform.AddComponent<PencilOutline>();
+                outline.SetMaterial(pencilOutlineMaterial);
+            }
+
+            spawned.Add(platform);
+        }
     }
-  }
 
-  public void ClearSpawned()
-  {
-    for (int i = 0; i < spawned.Count; i++)
+    private static List<Vector3> GetWorldPoints(LineRenderer line)
     {
-      if (spawned[i] != null)
-        Destroy(spawned[i]);
+        List<Vector3> points = new List<Vector3>(line.positionCount);
+
+        for (int i = 0; i < line.positionCount; i++)
+        {
+            Vector3 point = line.GetPosition(i);
+
+            if (!line.useWorldSpace)
+                point = line.transform.TransformPoint(point);
+
+            points.Add(point);
+        }
+
+        return points;
     }
-    spawned.Clear();
-  }
 
-  Vector3 PaperToWorld(Vector3 paperPoint)
-  {
-    Vector3 local = new Vector3(paperPoint.x, 0f, paperPoint.y);
-    if (paperOrigin != null)
-      return paperOrigin.TransformPoint(local);
-    return local;
-  }
+    public void ClearSpawned()
+    {
+        foreach (GameObject platform in spawned)
+        {
+            if (platform == null)
+                continue;
 
-  void Update()
-  {
-    if (Input.GetKeyDown(KeyCode.E))
-      ExtrudeAllLines();
-  }
+            MeshFilter filter = platform.GetComponent<MeshFilter>();
+
+            if (filter != null && filter.sharedMesh != null)
+                Destroy(filter.sharedMesh);
+
+            Destroy(platform);
+        }
+
+        spawned.Clear();
+    }
 }

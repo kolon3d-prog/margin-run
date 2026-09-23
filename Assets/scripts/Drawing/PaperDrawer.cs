@@ -12,7 +12,10 @@ public class PaperDrawer : MonoBehaviour
     [SerializeField] private float lineWidth = 0.18f;
     [SerializeField] private float minPointDistance = 0.05f;
 
-    [Tooltip("Максимум шагов в истории. 0 — без ограничения.")]
+    [Header("Drawing blockers")]
+    [SerializeField] private LayerMask drawingBlockerMask;
+
+    [Tooltip("   . 0   .")]
     [SerializeField] private int maxHistorySteps = 100;
 
     private readonly List<DrawingAction> undoHistory =
@@ -48,10 +51,12 @@ public class PaperDrawer : MonoBehaviour
         if (mouse == null || pencilTip == null || paperRenderer == null)
             return;
 
-        Vector3 drawingPosition = GetPencilTipWorldPosition();
+        Vector2 tipScreenPosition = GetPencilTipScreenPosition();
+        Vector3 drawingPosition = GetPencilTipWorldPosition(tipScreenPosition);
         bool pointerOverUI = IsPointerOverUI();
         bool pointerInsidePaper = IsInsidePaper(drawingPosition);
-        bool canDrawHere = pointerInsidePaper && !pointerOverUI;
+        bool pointerOverPlatform = IsPointerOverDrawingBlocker(tipScreenPosition);
+        bool canDrawHere = pointerInsidePaper && !pointerOverUI && !pointerOverPlatform;
 
         if (mouse.leftButton.wasPressedThisFrame)
         {
@@ -64,13 +69,12 @@ public class PaperDrawer : MonoBehaviour
             if (canDrawHere)
                 AddPoint(drawingPosition);
             else
-                currentLine = null;
+                FinishCurrentLine();
         }
 
         if (mouse.leftButton.wasReleasedThisFrame)
         {
-            currentLine = null;
-            CommitAction();
+            FinishCurrentLine();
         }
     }
 
@@ -123,9 +127,9 @@ public class PaperDrawer : MonoBehaviour
 
         if (currentLine != null &&
             currentLine.gameObject == lineObject)
-        {
+                            {
             currentLine = null;
-        }
+                            }
 
         activeLines.Remove(lineObject);
         pendingAction.Removed.Add(lineObject);
@@ -206,7 +210,7 @@ public class PaperDrawer : MonoBehaviour
 
         if (!visible &&
             currentLine != null &&
-            currentLine.gameObject == lineObject)
+                                currentLine.gameObject == lineObject)
         {
             currentLine = null;
         }
@@ -268,6 +272,15 @@ public class PaperDrawer : MonoBehaviour
                     Destroy(lineObject);
             }
         }
+    }
+
+    private void FinishCurrentLine()
+    {
+        if (currentLine == null)
+            return;
+
+        currentLine = null;
+        CommitAction();
     }
 
     private void StartLine(Vector3 position)
@@ -379,25 +392,34 @@ public class PaperDrawer : MonoBehaviour
         return insideHorizontal && insideVertical;
     }
 
-    private Vector3 GetPencilTipWorldPosition()
+    private Vector2 GetPencilTipScreenPosition()
     {
-        Vector2 tipScreenPosition =
-            RectTransformUtility.WorldToScreenPoint(
-                null,
-                pencilTip.position
-            );
+        return RectTransformUtility.WorldToScreenPoint(null, pencilTip.position);
+    }
 
+    private bool IsPointerOverDrawingBlocker(Vector2 screenPosition)
+    {
+        Ray ray = drawingCamera.ScreenPointToRay(screenPosition);
+        bool hit3D = Physics.Raycast(ray, Mathf.Infinity, drawingBlockerMask, QueryTriggerInteraction.Collide);
+
+        if (hit3D)
+            return true;
+
+        RaycastHit2D hit2D = Physics2D.GetRayIntersection(ray, Mathf.Infinity, drawingBlockerMask);
+        return hit2D.collider != null;
+    }
+
+    private Vector3 GetPencilTipWorldPosition(Vector2 tipScreenPosition)
+    {
         Vector3 screenPosition = new Vector3(
             tipScreenPosition.x,
             tipScreenPosition.y,
             Mathf.Abs(drawingCamera.transform.position.z)
         );
 
-        Vector3 worldPosition =
-            drawingCamera.ScreenToWorldPoint(screenPosition);
-
+        Vector3 worldPosition = drawingCamera.ScreenToWorldPoint(screenPosition);
         worldPosition.z = -0.1f;
-
         return worldPosition;
     }
+
 }
