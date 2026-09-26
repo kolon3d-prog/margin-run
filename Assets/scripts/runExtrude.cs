@@ -3,14 +3,23 @@ using UnityEngine;
 
 public class runExtrude : MonoBehaviour
 {
+    [Header("Sketch")]
     public PaperDrawer paperDrawer;
+
+    [Header("Stroke geometry")]
+    [Min(0.01f)] public float strokeRadius = 0.22f;
     [Min(0.1f)] public float platformDepth = 2.5f;
-    [Min(0.05f)] public float platformThickness = 0.35f;
-    [Min(0f)] public float simplifyTolerance = 0.06f;
-    [Range(0f, 20f)] public float horizontalSnapAngle = 5f;
-    [Min(0.001f)] public float minimumSegmentLength = 0.04f;
-    public Material wallMaterial;
-    public Material pencilOutlineMaterial;
+    [Min(0f)] public float simplifyTolerance = 0.04f;
+    [Min(100f)] public double clipperIntegerScale = 10000.0;
+    [Min(0.001f)] public float textureScale = 1f;
+
+    [Header("Rendering")]
+    public Material platformMaterial;
+    public Material edgeMaterial;
+    [Min(0.005f)] public float edgeWidth = 0.035f;
+    [Min(0f)] public float edgeSurfaceOffset = 0.003f;
+
+    [Header("Scene")]
     public Transform spawnParent;
     public string drawingBlockerLayerName = "DrawingBlocker";
 
@@ -39,8 +48,22 @@ public class runExtrude : MonoBehaviour
             if (line == null || line.positionCount < 2)
                 continue;
 
-            List<Vector3> points = GetWorldPoints(line);
-            Mesh mesh = LineExtruder.BuildPlatform(points, platformDepth, platformThickness, simplifyTolerance, horizontalSnapAngle, minimumSegmentLength);
+            List<Vector3> worldPoints = GetWorldPoints(line);
+            List<List<Vector2>> contours = StrokePolygonBuilder.Build(
+                worldPoints,
+                strokeRadius,
+                simplifyTolerance,
+                clipperIntegerScale
+            );
+
+            if (contours.Count == 0)
+                continue;
+
+            Mesh mesh = PolygonExtruder.Build(
+                contours,
+                platformDepth,
+                textureScale
+            );
 
             if (mesh.vertexCount == 0)
             {
@@ -48,7 +71,9 @@ public class runExtrude : MonoBehaviour
                 continue;
             }
 
-            GameObject platform = new GameObject("Platform_" + lineObject.name);
+            GameObject platform = new GameObject(
+                "Extruded_" + lineObject.name
+            );
 
             if (spawnParent != null)
                 platform.transform.SetParent(spawnParent, true);
@@ -57,20 +82,30 @@ public class runExtrude : MonoBehaviour
             filter.sharedMesh = mesh;
 
             MeshRenderer renderer = platform.AddComponent<MeshRenderer>();
-            renderer.sharedMaterial = wallMaterial;
+            renderer.sharedMaterial = platformMaterial;
 
             MeshCollider collider = platform.AddComponent<MeshCollider>();
             collider.sharedMesh = mesh;
 
-            int blockerLayer = LayerMask.NameToLayer(drawingBlockerLayerName);
+            int blockerLayer = LayerMask.NameToLayer(
+                drawingBlockerLayerName
+            );
 
             if (blockerLayer >= 0)
                 platform.layer = blockerLayer;
 
-            if (pencilOutlineMaterial != null)
+            if (edgeMaterial != null)
             {
-                PencilOutline outline = platform.AddComponent<PencilOutline>();
-                outline.SetMaterial(pencilOutlineMaterial);
+                PlatformContourOutline outline =
+                    platform.AddComponent<PlatformContourOutline>();
+
+                outline.Build(
+                    contours,
+                    platformDepth,
+                    edgeMaterial,
+                    edgeWidth,
+                    edgeSurfaceOffset
+                );
             }
 
             spawned.Add(platform);
@@ -96,8 +131,10 @@ public class runExtrude : MonoBehaviour
 
     public void ClearSpawned()
     {
-        foreach (GameObject platform in spawned)
+        for (int i = 0; i < spawned.Count; i++)
         {
+            GameObject platform = spawned[i];
+
             if (platform == null)
                 continue;
 

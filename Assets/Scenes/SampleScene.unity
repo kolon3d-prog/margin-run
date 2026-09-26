@@ -2155,6 +2155,8 @@ MonoBehaviour:
   simplifyTolerance: 0.06
   horizontalSnapAngle: 5
   minimumSegmentLength: 0.04
+  platformEdgeMaterial: {fileID: 2100000, guid: 76fefce85a118684da003d321a7fd684, type: 2}
+  platformEdgeWidth: 0.04
   wallMaterial: {fileID: 2100000, guid: 58781c3302accbe4385eae1a17557717, type: 2}
   pencilOutlineMaterial: {fileID: 2100000, guid: 8a078b0ea86648a418b2e7b1c7ca61e2, type: 2}
   spawnParent: {fileID: 694081884}
