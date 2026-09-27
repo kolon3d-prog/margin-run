@@ -6,6 +6,7 @@ public class modesketch : MonoBehaviour
 {
     public GameObject drawingRoot;
     public GameObject player;
+    public GameObject charSprite;
     public runExtrude extrude;
     GameObject ui;
     Camera cam;
@@ -30,6 +31,7 @@ public class modesketch : MonoBehaviour
         Bind();
         if (drawingRoot != null) drawingRoot.SetActive(on);
         if (ui != null) ui.SetActive(on);
+        if (charSprite != null) charSprite.SetActive(on);
         if (cam != null) cam.enabled = on;
 
         Cursor.lockState = on ? CursorLockMode.None : CursorLockMode.Locked;
