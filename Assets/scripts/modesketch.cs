@@ -1,3 +1,4 @@
+using System.Security.AccessControl;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,10 +9,11 @@ public class modesketch : MonoBehaviour
     public runExtrude extrude;
     GameObject ui;
     Camera cam;
+    bool started;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Bind()
     {
-        if (drawingRoot == null) drawingRoot = GameObject.Find("Player");
+        if (drawingRoot == null) drawingRoot = GameObject.Find("DrawingRoot");
         if (player == null) player = GameObject.Find("Player");
         if (extrude == null) extrude = FindFirstObjectByType<runExtrude>();
         if (ui == null) ui = GameObject.Find("Canvas");
@@ -27,10 +29,11 @@ public class modesketch : MonoBehaviour
     {
         Bind();
         if (drawingRoot != null) drawingRoot.SetActive(on);
+        if (ui != null) ui.SetActive(on);
         if (cam != null) cam.enabled = on;
-        if (on) return;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+
+        Cursor.lockState = on ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.visible = on;
     }
 
     public void GoSketch()
@@ -41,6 +44,11 @@ public class modesketch : MonoBehaviour
 
     void Update()
     {
+        if (!started && SceneManager.GetSceneByName("Drawing").isLoaded)
+        {
+            started = true;
+            GoSketch();
+        }
         if (Input.GetKeyDown(KeyCode.R))
         {
             Bind();

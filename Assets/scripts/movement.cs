@@ -110,7 +110,7 @@ public class PlayerMovement : MonoBehaviour
         // death below
 
         if (transform.position.y < -20f){
-            transform.position = new Vector3(0f, 2f, 0f); 
+            transform.position = new Vector3(-9f, -0f, -0f); 
             moveDirection = Vector3.zero;
             var mode = FindObjectOfType<modesketch>();
             if (mode != null)

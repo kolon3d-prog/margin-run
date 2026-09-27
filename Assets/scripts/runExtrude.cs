@@ -15,6 +15,7 @@ public class runExtrude : MonoBehaviour
 
     [Header("Rendering")]
     public Material platformMaterial;
+    public Material outlineMaterial;
     public Material edgeMaterial;
     [Min(0.005f)] public float edgeWidth = 0.035f;
     [Min(0f)] public float edgeSurfaceOffset = 0.003f;
@@ -83,6 +84,9 @@ public class runExtrude : MonoBehaviour
 
             MeshRenderer renderer = platform.AddComponent<MeshRenderer>();
             renderer.sharedMaterial = platformMaterial;
+
+            if (outlineMaterial != null)
+                platform.AddComponent<PencilOutline>().SetMaterial(outlineMaterial);
 
             MeshCollider collider = platform.AddComponent<MeshCollider>();
             collider.sharedMesh = mesh;
