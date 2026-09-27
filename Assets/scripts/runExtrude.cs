@@ -9,6 +9,7 @@ public class runExtrude : MonoBehaviour
     [Header("Stroke geometry")]
     [Min(0.01f)] public float strokeRadius = 0.22f;
     [Min(0.1f)] public float platformDepth = 2.5f;
+    public float depthPerWidth = 14f;
     [Min(0f)] public float simplifyTolerance = 0.04f;
     [Min(100f)] public double clipperIntegerScale = 10000.0;
     [Min(0.001f)] public float textureScale = 1f;
@@ -62,7 +63,7 @@ public class runExtrude : MonoBehaviour
 
             Mesh mesh = PolygonExtruder.Build(
                 contours,
-                platformDepth,
+                line.startWidth * depthPerWidth,
                 textureScale
             );
 

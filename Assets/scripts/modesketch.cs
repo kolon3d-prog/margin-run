@@ -1,6 +1,12 @@
+using System.Runtime.CompilerServices;
 using System.Security.AccessControl;
+using System.Threading.Tasks.Dataflow;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
+using System.Xml.Xsl;
+using System.ComponentModel.Design;
+using System.Numerics;
 
 public class modesketch : MonoBehaviour
 {
@@ -8,9 +14,14 @@ public class modesketch : MonoBehaviour
     public GameObject player;
     public GameObject charSprite;
     public runExtrude extrude;
+    public TransformBlock sketchView;
+    public CallerMemberNameAttribute playerCam;
+    public float camTime = 1.2f;
     GameObject ui;
     Camera cam;
     bool started;
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Bind()
     {
@@ -44,6 +55,45 @@ public class modesketch : MonoBehaviour
         if (player != null) player.SetActive(false);
     }
 
+    public void GoRun()
+    {
+        if (flying) return;
+        Bind();
+        if (extrude != null) extrude.ExtrudeAllLines();
+        ShowDraw(false);
+        if (player != null) player.SetActive(true);
+        if (sketchView != null) StartCoroutine(FlyToPlayer());
+    }
+
+    IEnumerator FlyToPlayer()
+    {
+        flying = true;
+        movement mv = player.GetComponent<movement>();
+        Transform camT = MenuCommand.playerCamera.transform;
+        Transform head = camT.parent;
+        Vector3 endPos = camT.localPosition;
+        Quaternion endRot = camT.localRotation;
+
+        mv.enabled = false;
+        camT.SetParent(null);
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / camTime;
+            float k = Mathf.SmoothStep(0f, 1f, t);
+            camT.position = Vector3.Lerp(sketchView.position, head.TransformPoint(endPos), k);
+            camT.rotation = Quaternion.Slerp(sketchView.rotation, head.rotation * endRot, k);
+            mv.playerCamera.fieldOfView = Mathf.Lerp(20f, 60f, k);
+            yield return null;
+        }
+        camT.SetParent(head);
+        camT.localPosition = endPos;
+        camT.localRotation = endRot;
+        mv.playerCamera.fieldOfView = 60f;
+        mv.enabled = true;
+        flying = false;
+    }
+
     void Update()
     {
         if (!started && SceneManager.GetSceneByName("Drawing").isLoaded)
@@ -51,13 +101,7 @@ public class modesketch : MonoBehaviour
             started = true;
             GoSketch();
         }
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            Bind();
-            if (extrude != null) extrude.ExtrudeAllLines();
-            ShowDraw(false);
-            if (player != null) player.SetActive(true);
-        }
+        if (Input.GetKeyDown(KeyCode.R)) GoRun();
         if (Input.GetKeyDown(KeyCode.T)) GoSketch();
     }
 }

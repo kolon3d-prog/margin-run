@@ -10,7 +10,11 @@ public class PaperDrawer : MonoBehaviour
     [SerializeField] private RectTransform pencilTip;
     [SerializeField] private SpriteRenderer paperRenderer;
     [SerializeField] private float lineWidth = 0.18f;
+    [SerializeField] private float minWidth = 0.08f;
+    [SerializeField] private float maxWidth = 0.6f;
+    [SerializeField] private float widthStep = 0.04f;
     [SerializeField] private float minPointDistance = 0.05f;
+    [SerializeField] private UnityEngine.UI.Slider widthSlider;
 
     [Header("Drawing blockers")]
     [SerializeField] private LayerMask drawingBlockerMask;
@@ -39,8 +43,20 @@ public class PaperDrawer : MonoBehaviour
 
     public IReadOnlyCollection<GameObject> ActiveLines => activeLines;
 
+    public void SetWidth(float W)
+    {
+        lineWidth = Mathf.Clamp(W, minWidth, maxWidth);
+    }
     private void Update()
     {
+        var kb = Keyboard.current;
+        if(kb != null)
+        {
+            if (kb.leftBracketKey.wasPressedThisFrame) lineWidth -= widthStep;
+            if (kb.rightBracketKey.wasPressedThisFrame) lineWidth += widthStep;
+            lineWidth = Mathf.Clamp(lineWidth, minWidth, maxWidth);
+            if (widthSlider != null) widthSlider.SetValueWithoutNotify(lineWidth);
+        }
         CheckHistoryShortcuts();
 
         if (!drawingEnabled)
