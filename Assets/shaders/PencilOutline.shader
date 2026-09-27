@@ -60,9 +60,16 @@ Shader "MarginRun/PencilOutline"
                 float2 screenUV = input.screenPos.xy / input.screenPos.w;
                 float2 pencilUV = screenUV * _ScreenParams.xy / max(_TextureScale, 1.0);
                 half4 stroke = SAMPLE_TEXTURE2D(_PencilStroke, sampler_PencilStroke, pencilUV);
-                half textureAlpha = lerp(1.0, stroke.a, _TextureStrength);
+                half graphite = lerp(
+                    1.0,
+                    0.7 + stroke.a * 0.3,
+                    _TextureStrength
+                );
+
                 half4 result = _OutlineColor;
-                result.a *= textureAlpha;
+                result.rgb *= graphite;
+                result.a = _OutlineColor.a;
+
                 return result;
             }
             ENDHLSL
