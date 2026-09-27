@@ -114,3 +114,6 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# Spec drafts, not part of the game
+/.kiro/
