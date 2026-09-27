@@ -248,6 +248,7 @@ MonoBehaviour:
   maxWidth: 0.6
   widthStep: 0.04
   minPointDistance: 0.05
+  widthSlider: {fileID: 0}
   drawingBlockerMask:
     serializedVersion: 2
     m_Bits: 128
@@ -2271,8 +2272,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 202.1, y: 25.4}
+  m_AnchoredPosition: {x: -356, y: -444}
+  m_SizeDelta: {x: 356, y: 25.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2125473607
 MonoBehaviour:

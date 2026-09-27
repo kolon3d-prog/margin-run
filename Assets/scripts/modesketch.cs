@@ -1,12 +1,6 @@
-using System.Runtime.CompilerServices;
-using System.Security.AccessControl;
-using System.Threading.Tasks.Dataflow;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections;
-using System.Xml.Xsl;
-using System.ComponentModel.Design;
-using System.Numerics;
 
 public class modesketch : MonoBehaviour
 {
@@ -14,13 +8,12 @@ public class modesketch : MonoBehaviour
     public GameObject player;
     public GameObject charSprite;
     public runExtrude extrude;
-    public TransformBlock sketchView;
-    public CallerMemberNameAttribute playerCam;
+    public Transform sketchView;
     public float camTime = 1.2f;
     GameObject ui;
     Camera cam;
     bool started;
-
+    bool flying;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Bind()
@@ -68,8 +61,8 @@ public class modesketch : MonoBehaviour
     IEnumerator FlyToPlayer()
     {
         flying = true;
-        movement mv = player.GetComponent<movement>();
-        Transform camT = MenuCommand.playerCamera.transform;
+        PlayerMovement mv = player.GetComponent<PlayerMovement>();
+        Transform camT = mv.playerCamera.transform;
         Transform head = camT.parent;
         Vector3 endPos = camT.localPosition;
         Quaternion endRot = camT.localRotation;
