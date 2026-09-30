@@ -10,6 +10,7 @@ public class knife : MonoBehaviour
   public Sprite[] frames;
   public float fps = 14f;
   bool playing;
+  public float lastHold = 0.3f;
 
   void OnEnable()
   {
@@ -31,6 +32,7 @@ public class knife : MonoBehaviour
       img.sprite = frames[i];
       yield return new WaitForSeconds(1f / fps);
     }
+    yield return new WaitForSeconds(lastHold);
     img.sprite = frames[0];
     playing = false;
   }
