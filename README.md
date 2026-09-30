@@ -30,7 +30,12 @@ open `SampleScene` and `Drawing` together in the editor, press Play.
 
 movement is kinda source-like (wishdir, air accel, friction). feels bad, but at least it's something. definitely should work on it in next weeks.
 
-## what we built so far
+## team
+
+- **me (kolon3d)** - movement, 3d, scene glue, the stupid bugs at 2am
+- **mkvinnnn** - 2d editor side + art.
+
+## week 1 ship
 
 - 2d paper drawer (lines, undo/redo, eraser)
 - line → prism extrude into the run scene(it's weird)
@@ -38,13 +43,6 @@ movement is kinda source-like (wishdir, air accel, friction). feels bad, but at 
 - multi-scene glue (drawing + sample scene). inspector drag between scenes is broken so we find stuff at runtime
 - death used to reload one scene and murder DrawingRoot. now it teleports + goes back to sketch
 - parkour pieces parented under one empty so we can rotate the whole level without breaking the drawer (dont rotate DrawingRoot. trust me)
-
-## team
-
-- **me (kolon3d)** - movement, 3d, scene glue, the stupid bugs at 2am
-- **mkvinnnn** - 2d editor side + art.
-
-## week 1 ship
 
 working loop: draw → extrude → run → die → draw again.
 
