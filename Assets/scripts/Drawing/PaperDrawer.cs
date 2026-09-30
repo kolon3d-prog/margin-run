@@ -15,6 +15,9 @@ public class PaperDrawer : MonoBehaviour
     [SerializeField] private float widthStep = 0.04f;
     [SerializeField] private float minPointDistance = 0.05f;
     [SerializeField] private UnityEngine.UI.Slider widthSlider;
+    [SerializeField] private float maxInk = 60f;
+    private float usedInk;
+    public float InkLeft => maxInk - usedInk;
 
     [Header("Drawing blockers")]
     [SerializeField] private LayerMask drawingBlockerMask;
@@ -46,6 +49,24 @@ public class PaperDrawer : MonoBehaviour
     public void SetWidth(float W)
     {
         lineWidth = Mathf.Clamp(W, minWidth, maxWidth);
+    }
+
+    private float InkCost(float width)
+    {
+        float t = Mathf.InverseLerp(minWidth, maxWidth, width);
+        return Mathf.Lerp(1f, 8f, t);
+    }
+
+    private float CountInk()
+    {
+        float total = 0f;
+        foreach (GameObject lineObject in activeLines)
+        {
+            LineRenderer line = lineObject.GetComponent<LineRenderer>();
+            for (int i = 1; i < line.positionCount; i++)
+                total += Vector3.Distance(line.GetPosition(i - 1), line.GetPosition(i)) * InkCost(line.startWidth);
+        }
+        return total;
     }
     private void Update()
     {
@@ -301,6 +322,9 @@ public class PaperDrawer : MonoBehaviour
 
     private void StartLine(Vector3 position)
     {
+        usedInk = CountInk();
+        if (usedInk >= maxInk)
+            return;
         BeginAction();
 
         GameObject lineObject = new GameObject("PencilLine");
@@ -330,16 +354,22 @@ public class PaperDrawer : MonoBehaviour
 
     private void AddPoint(Vector3 position)
     {
-        if (Vector3.Distance(lastPoint, position) < minPointDistance)
+        float dist = Vector3.Distance(lastPoint, position);
+        if (dist < minPointDistance)
             return;
+        float step = dist * InkCost(currentLine.startWidth);
+        if (step < minPointDistance)
+            return;
+        
+        if (usedInk + step > maxInk)
+        {
+            FinishCurrentLine();
+            return;
+        }
+        usedInk += step;
 
         currentLine.positionCount++;
-
-        currentLine.SetPosition(
-            currentLine.positionCount - 1,
-            position
-        );
-
+        currentLine.SetPosition(currentLine.positionCount - 1, position);
         lastPoint = position;
     }
 

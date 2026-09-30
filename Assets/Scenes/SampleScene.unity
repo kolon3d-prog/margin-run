@@ -668,6 +668,7 @@ MonoBehaviour:
   - {fileID: 5568892553154661097, guid: d7f19e955897eee4b904a4abcd227da7, type: 3}
   - {fileID: 4936622634408938880, guid: 836a766ba750d014383afcb62fc35acd, type: 3}
   fps: 14
+  lastHold: 1.2
 --- !u!1 &684574897
 GameObject:
   m_ObjectHideFlags: 0
